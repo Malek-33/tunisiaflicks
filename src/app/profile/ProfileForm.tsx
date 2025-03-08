@@ -53,7 +53,7 @@ export default function ProfileForm({ user }: { user: User }) {
       phone: user.phone || "",
       birthdate: user.birthdate || "",
     },
-  })
+  });
 
   async function onSubmit(data: ProfileFormValues) {
     setIsLoading(true)

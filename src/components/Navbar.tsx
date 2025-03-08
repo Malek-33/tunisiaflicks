@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect, usePathname } from 'next/navigation';
@@ -32,6 +32,25 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
 const Navbar = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
+
+  const [userData, setUserData] = useState<any>(null);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      // Fetch user data from the API route
+      fetch(`/api/user?userId=${session.user.id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.user) {
+            console.log(userData)
+            setUserData(data.user);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching user data:', error);
+        });
+    }
+  }, [session]);
 
   useEffect(() => {
     const handleContextMenu = (event) => {
@@ -90,7 +109,7 @@ const Navbar = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar>
-                    <AvatarImage src={session.user?.image || ''} />
+                    <AvatarImage src={userData?.image || session.user?.image || ''} />
                     <AvatarFallback>{session.user?.name?.charAt(0) || 'U'}</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
@@ -136,8 +155,8 @@ const Navbar = () => {
             <li className="flex justify-center p-2">
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <Avatar>
-                    <AvatarImage src={session.user?.image || ''} />
+                  <Avatar className='w-5 h-5'>
+                    <AvatarImage src={userData?.image || session.user?.image || ''} />
                     <AvatarFallback>{session.user?.name?.charAt(0) || 'U'}</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>

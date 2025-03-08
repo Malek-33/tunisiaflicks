@@ -1,7 +1,7 @@
 "use server"
 
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/src/pages/api/auth/[...nextauth]"
+import { authOptions } from "@/src/lib/auth"
 import clientPromise from "@/src/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { Session } from "next-auth"
@@ -33,21 +33,21 @@ export async function updateProfile(data: ProfileData) {
 }
 
 export async function updateAvatar(avatarDataUrl: string) {
-  const session = await getServerSession(authOptions) as Session | null
+  const session = await getServerSession(authOptions) as Session | null;
   if (!session) {
-    throw new Error("You must be logged in to update your avatar")
+    throw new Error("You must be logged in to update your avatar");
   }
 
-  const client = await clientPromise
-  const usersCollection = client.db().collection("users")
+  const client = await clientPromise;
+  const usersCollection = client.db().collection("users");
 
   const result = await usersCollection.updateOne(
     { _id: new ObjectId(session.user.id) },
     { $set: { image: avatarDataUrl } }
-  )
+  );
 
   if (result.modifiedCount === 0) {
-    throw new Error("Failed to update avatar")
+    throw new Error("Failed to update avatar");
   }
 }
 
